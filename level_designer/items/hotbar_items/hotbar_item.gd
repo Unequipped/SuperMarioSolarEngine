@@ -87,8 +87,7 @@ func _get_drag_data(_at_position):
 	if item_data == null:
 		return null
 
-	if !self.is_class("SearchItem"):
-		hotbar.swapping_item = self
+	hotbar.swapping_item = self
 
 	_tween_decrease()
 
@@ -115,7 +114,7 @@ func _can_drop_data(_at_position, data):
 
 
 func _drop_data(_at_position, data):
-	if item_icon.texture != null and item_data != null:
+	if item_icon.texture and item_data:
 		hotbar.swap_data(item_data)
 		hotbar.swapping_item = null
 		create_data(data)
