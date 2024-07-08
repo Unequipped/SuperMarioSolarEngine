@@ -1,11 +1,11 @@
 class_name Slip
 extends PlayerState
-## An attempt to implement slipping Slipping from a steep slope.
+## An attempt to implement slipping from a steep slope.
 ## Mostly made up of remixed sliding and diving code spliced together.
 
 @export var slip_accel: float = 0.5
 @export var max_slip_speed: float = 15
-@export var slip_friction: float = 0.05
+@export var slip_friction: float = 0.08
 
 var slip_speed: float = 0.0
 
@@ -16,12 +16,13 @@ func _on_enter(_handover):
 
 
 func _physics_tick():
-	var normal_angle: float = actor.get_floor_normal().angle()
+	var floor_normal: Vector2 = actor.get_floor_normal()
+	var normal_angle: float = floor_normal.angle()
 	var angle: float = normal_angle + TAU / 2 * Math.sign_positive(movement.facing_direction)
 
 	actor.doll.rotation = lerp_angle(actor.doll.rotation, angle, 0.5)
 
-	_modify_speed()
+	_modify_speed(floor_normal)
 
 
 func _on_exit():
@@ -29,15 +30,14 @@ func _on_exit():
 	actor.doll.rotation = 0
 
 
-func _modify_speed():
+func _modify_speed(floor_normal):
 	if movement.is_steep_slope():
-		_accelerate(slip_accel, max_slip_speed)
+		_accelerate(slip_accel, floor_normal, max_slip_speed)
 	elif !movement.is_steep_slope():
 		movement.decelerate(slip_friction)
 
 
-func _accelerate(amount: Variant, speed_cap: float):
-	var floor_normal: Vector2 = actor.get_floor_normal()
+func _accelerate(amount: Variant, floor_normal: Vector2, speed_cap: float):
 	var slip_direction: Vector2
 	slip_direction = _get_slip_dir(floor_normal)
 	
@@ -47,10 +47,9 @@ func _accelerate(amount: Variant, speed_cap: float):
 		slip_speed = speed_cap
 
 	actor.vel = slip_direction * slip_speed
-	actor.vel.y += 0.1
 
 
-## Get the slide direction downwards along the slope.
+## Get the slip direction downwards along the slope.
 func _get_slip_dir(floor_normal: Vector2) -> Vector2:
 	var direction: Vector2
 
