@@ -13,7 +13,6 @@ extends PlayerState
 
 
 func _on_enter(bellyflop):
-	movement.activate_freefall_timer()
 	movement.consume_coyote_timer()
 	movement.consec_jumps = 0
 	movement.dived = true
@@ -63,10 +62,7 @@ func _trans_rules():
 	if actor.push_rays.is_colliding() or actor.is_on_wall():
 		return &"Bonk"
 
-	if movement.can_air_action() and Input.is_action_just_pressed(&"down"):
+	if movement.can_air_action() and Input.is_action_just_pressed(&"groundpound"):
 		return &"GroundPound"
-
-	if movement.finished_freefall_timer():
-		return &"Freefall"
 
 	return &""

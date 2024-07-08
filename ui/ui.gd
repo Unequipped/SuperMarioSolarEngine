@@ -2,13 +2,10 @@ class_name UserInterface
 extends CanvasLayer
 ## UI and utility.
 
-# temporary for debug label
-@onready var player: CharacterBody2D = get_parent().find_child("Mario")
-
 #region Notification variables
 @export var notif_scene: PackedScene
 
-@onready var notif_list: Node = $Notifications
+@export var notif_list: Node
 
 var current_notifs: Array = []
 #endregion
@@ -16,7 +13,7 @@ var current_notifs: Array = []
 #region Input Display variables
 @onready var sprite_dictionary: Dictionary = {
 	KEY_SHIFT: %Shift,
-	KEY_Z: %Z,
+	KEY_W: %W,
 	KEY_X: %X,
 	KEY_C: %C,
 	KEY_UP: %Up,
@@ -25,12 +22,15 @@ var current_notifs: Array = []
 	KEY_LEFT: %Left,
 }
 
+@export var pause_menu: Control
+
 var input_event: InputEvent
 #endregion
 
 
 func _ready():
 	GameState.connect(&"frame_advanced", _push_notif.bind(&"push", "Advanced 1 frame."))
+	GameState.connect(&"paused", pause_menu.enable_disable)
 
 
 func _process(_delta):
@@ -66,14 +66,14 @@ func _display_input(event: InputEvent):
 	if not event is InputEventKey:
 		return
 
-	var event_str: Key = event.keycode
+	var event_str: Key = event.physical_keycode
 
 	if not sprite_dictionary.has(event_str):
 		return
 
-	var sprite: Sprite2D = sprite_dictionary[event_str]
+	var texture: TextureRect = sprite_dictionary[event_str]
 
 	if event.is_pressed():
-		sprite.set_modulate(Color(1, 1, 1, 1))
+		texture.set_modulate(Color(1, 1, 1, 1))
 	else:
-		sprite.set_modulate(Color(1, 1, 1, 0.5))
+		texture.set_modulate(Color(1, 1, 1, 0.5))
